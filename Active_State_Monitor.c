@@ -53,10 +53,17 @@ int main(int argc, char *argv[])
         } else if (result == 0){
             printf("Время вышло!\n");
             memset(adress, '-', 16);
-            msync(adress,16);
-            printf("Таймаут: %.*s\n", 16, adress, MS_SYNC);
+            msync(adress,16, MS_SYNC);
+            printf("Таймаут: %.*s\n", 16, adress);
         } else {
-
+            if(fds[0].revents & POLLIN){
+                char buf[16];
+                ssize_t calk = read(STDIN_FILENO,buf,16);
+                if(calk > 0){
+                    memcpy(adress,buf,calk);
+                    msync(adress,16,MS_SYNC);
+                }
+            }
         }
     }
 
